@@ -4,8 +4,17 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import cv2
 import requests
+from twilio.rest import Client
+import os 
+# Twilio API Credentials
+ACCOUNT_SID = "AC1dc5d85e16f3f02c0b556f731f45e1e2"
+AUTH_TOKEN = "077a32f635dd4b9c2dc8e73aaf8be9b8"
+TWILIO_PHONE_NUMBER = "+12626864607"
+EMERGENCY_CONTACT = "+918459705185" 
 # Load trained model
-model = load_model('C:\\Users\\Lenovo\\Desktop\\mlops_pro\\models\\trained.h5')
+
+model = load_model("C:\\Users\\Lenovo\\Desktop\\mlops_pro\\models\\trained.h5")
+
 
 # Streamlit UI
 st.title("Image Prediction App")
@@ -27,6 +36,17 @@ if uploaded_file is not None:
     st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
     if (y_pred<0.5):
         st.write("accident detected")
+        def send_sms(message):
+            client=Client(ACCOUNT_SID,AUTH_TOKEN)
+            message=client.messages.create(
+                body=message,
+                from_=TWILIO_PHONE_NUMBER,
+                to=EMERGENCY_CONTACT
+            )
+            return message.sid
+        message_alert='Accident detected provide emergency services and ambulance facilities'
+        message_id = send_sms(message_alert)
+        st.success(f"Emergency SMS Sent! Message ID: {message_id}")
     else:
         st.write("everything is okay no accident detected")
 
@@ -53,11 +73,23 @@ if run:
 
         # Display prediction result
         if prediction > 0.5:
-            label = "No Accident ✅"
+            label = "No Accident "
             color = (0, 255, 0)
+            
         else:
-            label = "Accident Detected ❌"
+            label = "Accident Detected "
             color = (0, 0, 255)
+            def send_sms(message):
+                client=Client(ACCOUNT_SID,AUTH_TOKEN)
+                message=client.messages.create(
+                    body=message,
+                    from_=TWILIO_PHONE_NUMBER,
+                    to=EMERGENCY_CONTACT
+                )
+                return message.sid
+            message_alert='Accident detected provide emergency services and ambulance facilities'
+            message_id = send_sms(message_alert)
+            st.success(f"Emergency SMS Sent! Message ID: {message_id}")
 
         # Show label on video
         cv2.putText(frame, label, (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
@@ -99,6 +131,17 @@ if run2:
             else:
                 label = "Accident Detected ❌"
                 color = (0, 0, 255)
+                def send_sms(message):
+                    client=Client(ACCOUNT_SID,AUTH_TOKEN)
+                    message=client.messages.create(
+                        body=message,
+                        from_=TWILIO_PHONE_NUMBER,
+                        to=EMERGENCY_CONTACT
+                    )
+                    return message.sid
+                message_alert='Accident detected provide emergency services and ambulance facilities'
+                message_id = send_sms(message_alert)
+                st.success(f"Emergency SMS Sent! Message ID: {message_id}")
 
         # Show label on video
             cv2.putText(frame, label, (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)

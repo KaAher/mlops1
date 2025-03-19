@@ -1,13 +1,21 @@
-FROM python :3.11.9 as builder
-WORKDIR /frontpage
+FROM python:3.9
 
-COPY req_dev.txt .
+WORKDIR /mlops_pro  # Set working directory inside the container
+RUN apt-get update && apt-get install -y libgl1 libglib2.0-0 && rm -rf /var/lib/apt/lists/*
 
-RUN pip install -r req_dev.txt
+# Copy and install dependencies
+COPY req_dev.txt /req_dev.txt
+RUN pip install --upgrade pip && pip install -r /req_dev.txt  
 
+# Copy all project files
 COPY . .
 
-RUN pip install
+# Ensure model is in the correct location
+COPY models/trained.h5 /mlops_pro/models/trained.h5
 
-EXPOSE 8501
-CMD [ "streamlit","run","webapp/frontpage", "--server.port=8501", "--server.address=0.0.0.0"]
+# Copy frontpage.py
+COPY webapp/pages/frontpage.py /mlops_pro/webapp/pages/frontpage.py
+
+EXPOSE 8501  
+
+CMD ["streamlit", "run", "/mlops_pro/webapp/pages/frontpage.py", "--server.port=8501", "--server.address=0.0.0.0"]
