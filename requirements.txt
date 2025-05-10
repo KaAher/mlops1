@@ -6,7 +6,7 @@ pathlib
 joblib
 keras
 PyYAML
-opencv-python
+opencv-python-headless
 dvc
 seaborn
 matplotlib
